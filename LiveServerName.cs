@@ -22,21 +22,24 @@ public class LiveServerName
     {
         _acServerConfiguration = acServerConfiguration;
         _configuration = configuration;
-        if (_listOfNamesCopy.Count < 1)
-        {
-            Log.Warning($"No entries found for LiveServerNameConfiguration");
-            return;
-        }
 
         _originalName = acServerConfiguration.Server.Name;
         _listOfNamesCopy = configuration.ListOfNames;
-        if (_listOfNamesCopy.Count > MAX_ENTRIES)
+        if (_listOfNamesCopy.Count < 1)
         {
-            _listOfNamesCopy = _listOfNamesCopy.Take(MAX_ENTRIES).ToList();
+            Log.Warning($"No entries found for LiveServerNameConfiguration");
+        }
+        else
+        {
+            if (_listOfNamesCopy.Count > MAX_ENTRIES)
+            {
+                _listOfNamesCopy = _listOfNamesCopy.Take(MAX_ENTRIES).ToList();
+            }
+
+            Log.Information($"Loaded LiveServerNamePlugin with ({_listOfNamesCopy.Count}) entries: {string.Join(", ", _listOfNamesCopy)}");
+            StartAsyncTask();
         }
 
-        Log.Information($"Loaded LiveServerNamePlugin with ({_listOfNamesCopy.Count}) entries: {string.Join(", ", _listOfNamesCopy)}");
-        StartAsyncTask();
         applicationLifetime.ApplicationStopping.Register(OnApplicationStopping);
     }
 
